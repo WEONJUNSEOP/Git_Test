@@ -1,0 +1,97 @@
+[git 용어]
+Local Repository: 로컬 저장소 // C:\file\.git
+Remote Repository: 원격 저장소 // github
+.git\index: Stage file
+.git\HEAD: Repository Contents // ref: refs/heads/main
+Working Directory: Current timepoint of worker who is viewing one of the timepoint of the Repository // 파일 수정이나 저장 등의 작업을 하는 공간
+Staginf Area: 저장소에 커밋하기 전에 준비하는 위치
+Commit: 현재의 변경된 작업 상태를 스테이징 해서 점검하고 나면, 확정하고 작업 내역을 저장소에 저장하는 작업
+Snapshot: 특정 시점에서의 폴더나 파일 같은 작업 디렉토리의 변경 상태를 의미 // 스테이징과 커밋을 실시할 시, 이전 스냅샷과의 변경점이 기록됨
+Head: 현재 작업 중인 브랜치를 가리킴 // @로 표기
+Branch: 분기점. 이후에 곂치는 작업물이 없는 파일에 한해서 메인 브랜치와 다시 병합할 수 있음
+Integration Branch: 언제든 배포할 수 있어야 하는 릴리즈가 커밋되는 가장 안정적인 브랜치 // main
+Release Branch: 메인 브랜치로 커밋하기 전에 최종 점검을 위해 개발 브랜치에서 갈라져 나와서 이후에 다시 병합되는 브랜치 // release-0.1.0
+Hotfix Branch: 메인 브랜치에서 임시로 갈라져 나와서 긴급한 버그 수정 후에 개발 브랜치와 메인 브랜치로 병합되는 브랜치 // hotfix-0.1.1
+Develop Branch: 처음부터 메인 브랜치에서 분리되어 개발을 위해 사용하는 브랜치 // develop-0.0.1
+Topic Branch: 기능 추가, 버그 수정 같은 단위 작업을 하기 위해 개발 브랜치에서 갈라져 나와서 이후에 다시 병합되는 작업 브랜치 // feature
+Checkout: 다른 브랜치를 불러오는 것
+Merge: 다른 브랜치의 내용을 현재 브랜치로 가져와서 합치는 작업 // 병렬 상태로 병합
+Rebase: 토픽 브랜치가 사라지고 메인 브랜치와 직렬로 병합
+
+[git 명령어]
+1. 초기 설정
+로컬 저장소 생성: git init
+원격 저장소 클론: git clone <remote_repo_url>
+개행 문자 커밋 옵션 설정: git config --global core.autocrlf true // 리눅스와 맥은 true 대신에 input
+사용자 이름 설정: git config --global user.name "<user_name>"
+사용자 이메일 설정: git config --global user.email "<user_email>"
+글로벌 환경 설정 리스트 출력: git config --global --list // --global 을 제외하면, 모든 설정 리스트 출력
+
+2. 스테이징 및 커밋
+스테이지 상태 확인: git status // 요약 표기 옵션: -s
+스테이지 영역에 파일 추가: git add <file_name>
+스테이지 영역에 수정된 파일을 전부 추가: git add .
+스테이지 영역을 초기화: git reset
+커밋: git commit -m "<commit_message>" // 직전 커밋에 덮어 씌우는 옵션: --amend
+스테이지 영역에 파일 추가와 동시에 커밋: git commit -a -m "<commit_message>"
+로컬/원격 저장소에서 파일 삭제: git rm <file_name>
+스테이지 영역에서만 제거. 즉, 원격 저장소에서만 파일 삭제: git rm --cached <file_name> // git restore --staged <file_name>
+
+3. 커밋 이력
+최근 n개의 커밋들만 표기하는 옵션: -n
+모든 브랜치를 표기하는 옵션: --all
+커밋 내역 출력: git log
+요약된 커밋 내역 출력: git shortlog
+커밋들을 비교: git log -p
+그래프로 커밋 내역 출력: git log --graph
+커밋마다 파일의 추가/삭제된 통계데이터 출력: git log --stat
+커밋마다 한 줄로 커밋 내역 출력: git log --oneline
+파일 이력 출력: git log <file_name> // 비교하는 옵션: -p
+파일에 대한 모든 수정 내역 출력: git blame <file_name>
+
+4. 커밋 비교
+커밋의 정보와 수정사항 보기: git show <commit_hash>
+최근 커밋과 현재 작업 디렉토리 파일 비교: git diff // 변화가 생긴 파일 목록만 표기하는 옵션: --name-only
+최근 커밋과 현재 스테이지된 파일 비교: git diff --staged // 변화가 생긴 파일 목록만 표기하는 옵션: --name-only
+헤드에서 x번째 떨어진 커밋을 기준으로 헤드에서 y번째 떨어진 커밋을 비교: git diff @~x @~y // 변화가 생긴 파일 목록만 표기하는 옵션: --name-only
+<commit_hash_1> 을 기준으로 <commit_hash_2> 을 비교: git diff <commit_hash_1> <commit_hash_2> // 변화가 생긴 파일 목록만 표기하는 옵션: --name-only
+현재 브랜치와 <branch_name> 비교: git diff <branch_name>
+
+5. 커밋 되돌리기
+헤드에서 n번째 떨어진 커밋으로 되돌리지만 작업 디렉토리와 스테이지는 보존: git reset --soft HEAD~n // 작업 디렉토리와 스테이지까지 완전 되돌리는 옵션: --soft 대신에 --hard
+<commit_hash> 으로 되돌리지만 작업 디렉토리와 스테이지는 보존: git reset --soft <commit_hash> // 작업 디렉토리와 스테이지까지 완전 되돌리는 옵션: --soft 대신에 --hard
+헤드에서 n번째 떨어진 커밋 파일로 다시 커밋: git revert @~n // 기록된 스냅샷을 이용해 이전의 커밋을 재커밋하기 때문에 현재의 작업 디렉토리가 스냅샷에 기록된 수정전 파일과 충돌할 수 있음을 주의! // 바로 커밋시키지 않고 스냅샷에 기록된 변경 사항을 스테이징만 하는 옵션: -no--commit
+<commit_hash> 의 파일 상태로 다시 커밋: git revert <commit_hash> // 기록된 스냅샷을 이용해 이전의 커밋을 재커밋하기 때문에 현재의 작업 디렉토리가 스냅샷에 기록된 수정전 파일과 충돌할 수 있음을 주의! // 바로 커밋시키지 않고 스냅샷에 기록된 변경 사항을 스테이징만 하는 옵션: -no--commit
+
+6. 브랜치
+<commit_hash> 에 새로운 브랜치 생성: git branch <branch_name> <commit_hash>
+브랜치 제거: git branch -D <branch_name>
+해당 브랜치로 전환: git checkout <branch_name> // 브랜치 생성 후 바로 전환하는 옵션: -b
+현재 브랜치 헤드에 <branch_name> 을 병렬 상태로 병합: git merge <branch_name>
+현재 브렌치 헤드에 <branch_name> 을 직렬로 병합: git rebase <branch_name>
+
+7. 원격 저장소
+원격 저장소 연결: git remote add <remote_repo_name> <remote_repo_url>
+원격 저장소로 브랜치 올리기: git push <remote_repo_name> <local_branch_name> // 원격 저장소 로컬 저장소 동기화 옵션: -u
+원격 저장소에서 브랜치 내려받기: git fetch <remote_repo_name> <remote_branch_name>
+원격 저장소에서 브랜치 내려받기와 동시에 현재 브랜치 헤드에 병렬로 병합: git pull <remote_repo_name> <remote_branch_name>
+원격 저장소 url 얻기: git remote get-url <remote_repo_name>
+추가한 원격 저장소 목록 보기: git remote // 상세히 보기 옵션: -v
+원격 저장소 정보 보기: git remote show <remote_repo_name>
+원격 저장소 이름 변경: git remote rename <old_remote_repo_name> <new_remote_repo_name>
+원격 저장소 제거: git remote remove <remote_repo_name>
+
+8. 태그
+전체 태그 조회: git tag // 조건에 맞는 태그 조회 옵션: -l '<part_of_tag_name>*'
+커밋 번호와 대응되는 태그를 동시에 조회: git show-ref --tags // 태그라는 포인터가 가리키는 내용도 보여주는 옵션(뒤에 ^{} 가 붙어서 표시됨): --dereference
+원격 저장소 태그 조회: git ls-remote --tags
+특정 태그에 대한 정보 조회: git show <tag_name>
+경량 태그 생성: git tag <tag_name> // 단순한 특정 커밋 해시만을 가리키는 포인터임
+경량 태그 생성 및 지정: git tag <tag_name> <commit_hash>
+주석이 달린 태그 생성: git tag -a <tag_name> -m "<tag_message>" // 주석이 달린 태그는 자체 데이터를 가지고 있는 객체라서 태그 해시가 따로 존재하며, <tag_name>^{} 가 커밋 해시를 가리키는 포인터임
+주석이 달린 태그 지정: git tag -a <tag_name> <commit_hash>
+주석이 달린 태그 생성 및 지정:  git tag -a <tag_name> <commit_hash> -m "<tag_message>"
+로컬 저장소 태그 삭제: git tag -d <tag_name>
+원격 저장소로 태그 올리기: git push <remote_repo_name> <tag_name>
+원격 저장소로 모든 태그 올리기: git push <remote_repo_name> --tags
+원격 저장소 태그 삭제: git push <remote_repo_name> -d <tag_name>
